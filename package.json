@@ -9,6 +9,8 @@
   "dependencies": {
     "@iden3/js-crypto": "^1.0.0-beta.1",
     "@noble/bls12-381": "^1.4.0",
+    "@noble/curves": "^1.1.0",
+    "bls-wasm": "^1.0.1",
     "ethereumjs-util": "^7.1.5"
   }
 }
