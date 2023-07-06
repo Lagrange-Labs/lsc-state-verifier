@@ -1,5 +1,4 @@
 const { poseidon } = require('@iden3/js-crypto');
-const bls = require('@noble/bls12-381');
 const { keccak256, toBuffer, bufferToHex } = require('ethereumjs-util');
 
 // Define a function to compute the Keccak hash of elements
