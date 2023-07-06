@@ -1,0 +1,14 @@
+{
+  "name": "hash-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@iden3/js-crypto": "^1.0.0-beta.1",
+    "@noble/bls12-381": "^1.4.0",
+    "ethereumjs-util": "^7.1.5"
+  }
+}
