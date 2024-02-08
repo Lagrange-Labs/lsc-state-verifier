@@ -6,11 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@chainsafe/bls": "^7.1.1",
-    "@chainsafe/blst": "^0.2.4",
-    "@iden3/js-crypto": "^1.0.0-beta.1",
+    "@chainsafe/bls": "^7.1.2",
+    "@iden3/js-crypto": "1.0.0-beta.1",
     "@noble/bls12-381": "^1.4.0",
-    "ethereumjs-util": "^7.1.5"
+    "circomlib": "^0.5.5",
+    "circomlibjs": "^0.1.7",
+    "ethereumjs-util": "^7.1.5",
+    "node-fetch": "^3.3.2",
+    "prettier": "^3.1.0"
   }
 }
