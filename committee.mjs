@@ -9,7 +9,8 @@ const CHAIN_CONFIG = {
   OPTIMISM: "420",
 };
 const BLOCK_NUMBER = 19635965;
-const URI = "https://querylayer.lagrange.dev";
+const URI =
+  "http://lagrange-query-layer-env.eba-ygn6m8ig.us-east-1.elasticbeanstalk.com";
 var leaves = [];
 
 function bigint_to_array(n, k, x) {
