@@ -4,7 +4,7 @@ import { PointG1 } from "./index.js";
 import pkg from "@iden3/js-crypto";
 const { poseidon } = pkg;
 
-const X_API_KEY = "2YLVF0obYk1E5UGvpA8rA3N3ATib8Kso1PhvtAB2"; // TODO: add API key
+const X_API_KEY = ""; // TODO: add API key
 const CHAIN_CONFIG = {
   OPTIMISM: "420",
 };
