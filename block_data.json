@@ -1,0 +1,40 @@
+{
+    "address": [
+        "0x482FB1fEd4E69A4494FA8be2ea72f1b6727AbbB1",
+        "0x790747c66266F950924339B56e19174f57288ce8",
+        "0x88de6bA9c3c6463a4d1CEC7a625D180Dc03d0235",
+        "0x76d293DB2330Bd1Eb94239ebAB80E8894D5c92D2",
+        "0x001a43c4da6481cBa4b5baBe67382b1c3b513684"
+    ],
+    "agg_signature": "d765d3eef3ac14662aa101abfd149aa84c3da1f01ed454e3838892bfbae4a8de0bd9124bea55bdf3a8b9a196a55c56052d57296fa9ec9ce28222662f6b956744",
+    "aggregationBits": [
+        0,
+        1,
+        1,
+        1,
+        1
+    ],
+    "chain_header": {
+        "block_hash": "0x22a6c5a934dcd0510afcedcb2706800a8d8b9e60561b35802cd6e467fd18bbe2",
+        "block_number": 3186359,
+        "chain_id": 5003
+    },
+    "currentCommitteeeRoot": "1768ba0473721525a355e3c8f16e3a081b124316923f501ae07b2cbfb0673d69",
+    "nextCommitteeRoot": "1768ba0473721525a355e3c8f16e3a081b124316923f501ae07b2cbfb0673d69",
+    "pubkeys": [
+        "d1d3df54f2b1a0eac84d76b0844fb34f78364e667bb9589086edbbf83b2c6ec9",
+        "9f1c2ac7420289fc10c2b05403dfa41a5805c0d8513930cdc19fed05763cc84b",
+        "989807d19f1be4c5bf155e3539b975a7fb5be1533e04223d7ec9802b953cec5e",
+        "a4d76a9660c765001128a3558f79ee3d517cb3c9e2e362ad6c67e14e4fc12b22",
+        "86a6f688787a19b885b07a22e95bffaca6073cfccc67a625695a5b2d12f936a5"
+    ],
+    "totalNumberOfCurrentSigners": 5,
+    "totalVotingPower": 1500000,
+    "votingPower": [
+        100000,
+        200000,
+        300000,
+        400000,
+        500000
+    ]
+}
