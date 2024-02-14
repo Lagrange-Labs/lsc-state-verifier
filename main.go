@@ -12,7 +12,7 @@ import (
 type BlockData struct {
 	Addrs        []string `json:"address"`
 	BLSPubKeys   []string `json:"pubkeys"`
-	VotingPowers []int    `json:"votingPower"`
+	VotingPowers []uint64 `json:"votingPower"`
 }
 
 func main() {
@@ -42,5 +42,5 @@ func main() {
 	}
 
 	rootHash := merkle.GetRootHash(leaves)
-	fmt.Printf("Root hash: %x\n", rootHash)
+	fmt.Printf("Root hash: %x\n", rootHash) // 1768ba0473721525a355e3c8f16e3a081b124316923f501ae07b2cbfb0673d69
 }

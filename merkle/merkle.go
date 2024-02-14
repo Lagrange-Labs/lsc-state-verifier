@@ -13,7 +13,7 @@ var (
 	innerPrefix = uint8(2)
 )
 
-func GetLeafHash(addr, pubKey []byte, votingPower int) []byte {
+func GetLeafHash(addr, pubKey []byte, votingPower uint64) []byte {
 	res := make([]byte, 0, 1+32+32+20+12)
 
 	res = append(res, leafPrefix)
@@ -42,15 +42,16 @@ func GetRootHash(leaves [][]byte) []byte {
 		return []byte{}
 	}
 
+	// make sure the number of leaves is a power of 2
 	leavesCount := 1
 	for leavesCount < count {
 		leavesCount *= 2
 	}
-
 	for i := count; i < leavesCount; i++ {
 		leaves = append(leaves, make([]byte, 32))
 	}
 
+	// calculate the root hash
 	for leavesCount > 1 {
 		for i := 0; i < leavesCount/2; i++ {
 			leaves[i] = GetInnerHash(leaves[i*2], leaves[i*2+1])
