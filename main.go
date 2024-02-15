@@ -3,10 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"os"
 
 	"github.com/Lagrange-Labs/hash-demo/crypto"
 	"github.com/Lagrange-Labs/hash-demo/merkle"
+	"github.com/joho/godotenv"
 )
 
 type BlockData struct {
@@ -16,17 +20,39 @@ type BlockData struct {
 }
 
 func main() {
-	// TODO: implement getting the data from the query-layer
-	// instead of file reading
-	file, err := os.Open("block_data.json")
+
+	const (
+		OPTIMISM = "11155420"
+		ARBITRUM = "421614"
+		MANTLE = "5003"
+	)
+	BLOCK_NUMBER := "14483253"
+
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal("Error loading .env file")
 	}
-	defer file.Close()
+	apiKey := os.Getenv("API_KEY")
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://querylayer.lagrange.dev/blocks/block-data?chain_id=%s&block_number=%s", ARBITRUM, BLOCK_NUMBER), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("x-api-key", apiKey)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var blockData BlockData
-	if err = json.NewDecoder(file).Decode(&blockData); err != nil {
-		panic(err)
+	if err = json.Unmarshal(body, &blockData); err != nil {
+		log.Fatal(err)
 	}
 
 	blsScheme := crypto.NewBLSScheme(crypto.BN254)
@@ -36,11 +62,11 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("Raw public key for %s: %x\n", addr, rawPubKey)
+		fmt.Printf("\nRaw public key for %s: %x\n", addr, rawPubKey)
 		leaves[i] = merkle.GetLeafHash(crypto.Hex2Bytes(addr), rawPubKey, blockData.VotingPowers[i])
 		fmt.Printf("Leaf hash for %s: %x\n", addr, leaves[i])
 	}
 
 	rootHash := merkle.GetRootHash(leaves)
-	fmt.Printf("Root hash: %x\n", rootHash) // 1768ba0473721525a355e3c8f16e3a081b124316923f501ae07b2cbfb0673d69
+	fmt.Printf("\nCommittee Root: %x\n", rootHash)
 }
