@@ -13,7 +13,6 @@ import (
 
 	"github.com/Lagrange-Labs/hash-demo/crypto"
 	"github.com/Lagrange-Labs/hash-demo/merkle"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/joho/godotenv"
 )
 
@@ -33,15 +32,15 @@ type BlockData struct {
 }
 
 func (b BlockData) Hash() []byte {
-	var blockNumberBuf common.Hash
-	blockHash := common.FromHex(b.ChainHeader.BlockHash)[:]
+	var blockNumberBuf [32]byte
+	blockHash := crypto.Hex2Bytes(b.ChainHeader.BlockHash)[:]
 	blockNumber := big.NewInt(int64(b.ChainHeader.BlockNumber)).FillBytes(blockNumberBuf[:])
 	chainID := make([]byte, 4)
 	binary.BigEndian.PutUint32(chainID, b.ChainHeader.ChainID)
 	chainHash := crypto.Hash(blockHash, blockNumber, chainID)
 
-	committeeRoot := common.FromHex(b.CurrentCommittee)
-	nextCommitteeRoot := common.FromHex(b.NextCommittee)
+	committeeRoot := crypto.Hex2Bytes(b.CurrentCommittee)
+	nextCommitteeRoot := crypto.Hex2Bytes(b.NextCommittee)
 	committeeHash := crypto.PoseidonHash(chainHash, committeeRoot, nextCommitteeRoot)
 
 	return committeeHash
@@ -99,7 +98,7 @@ func main() {
 
 	rootHash := merkle.GetRootHash(leaves)
 
-	if bytes.Equal(rootHash, common.Hex2Bytes(blockData.CurrentCommittee)) {
+	if bytes.Equal(rootHash, crypto.Hex2Bytes(blockData.CurrentCommittee)) {
 		commitHash := blockData.Hash()
 		pubKeys := make([][]byte, 0)
 		for i, pubKey := range blockData.BLSPubKeys {
@@ -116,6 +115,6 @@ func main() {
 		}
 		fmt.Printf("Aggregated signature verified: %t\n", verified)
 	} else {
-		fmt.Printf("Root hash does not match: %x != %x\n", rootHash, common.Hex2Bytes(blockData.CurrentCommittee))
+		fmt.Printf("Root hash does not match: %x != %x\n", rootHash, crypto.Hex2Bytes(blockData.CurrentCommittee))
 	}
 }
