@@ -53,7 +53,7 @@ func main() {
 		ARBITRUM = "421614"
 		MANTLE   = "5003"
 	)
-	BLOCK_NUMBER := "17970459"
+	BLOCK_NUMBER := "17974482"
 
 	err := godotenv.Load()
 	if err != nil {

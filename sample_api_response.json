@@ -9,11 +9,11 @@
     "0x032145C977D623B34DD8702c44484b693013f885",
     "0xb7c842A102d9Dc6f0286B4EF39De2f8C804bE226"
   ],
-  "agg_signature": "dfeb4b47926755642fbb6bd55a2d1e6184c8ba8aeab525e4d0a90947c358feb11880e927bc80eab7e128113ac00d09e7aaf8a5febeb9f263596d3b6d26610bcb",
+  "agg_signature": "c2e689dc25bf9fb15c0c402193fe1886445fdb8321a31aa230007865d49346ba1c2f1cde16e4de9f7ffc440f9861b3dd1b12a666d7760cc1dbf6ff73167483dd",
   "aggregationBits": [1, 1, 1, 1, 1, 1, 1, 1],
   "chain_header": {
-    "block_hash": "0x93c724952623e01904d26c5a85be8a200db8a057364f3bed16111e184a4e36e6",
-    "block_number": 17970459,
+    "block_hash": "0xccd373680cafcad9794098afa9d19a0f96d4e1628947145b288b82a6d9155577",
+    "block_number": 17974482,
     "chain_id": 421614
   },
   "currentCommitteeeRoot": "82e4ebb7f27cac64fb1c3f8dbd77be0a56079f94ae48fd46456cf06996375eff",
