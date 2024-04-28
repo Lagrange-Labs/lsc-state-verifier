@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/Lagrange-Labs/hash-demo/merkle"
 	"github.com/Lagrange-Labs/lagrange-node/crypto"
 	batchtypes "github.com/Lagrange-Labs/lagrange-node/sequencer/types/v2"
 	"github.com/Lagrange-Labs/lagrange-node/utils"
@@ -34,9 +33,9 @@ func (sp *StateProof) GetBatchHash() []byte {
 func (sp *StateProof) VerifyCommitteeRoot() bool {
 	leaves := make([][]byte, len(sp.OperatorAddresses))
 	for i, operator := range sp.OperatorAddresses {
-		leaves[i] = merkle.GetLeafHash(utils.Hex2Bytes(operator), utils.Hex2Bytes(sp.BLSPublicKeys[i]), sp.VotingPowers[i])
+		leaves[i] = GetLeafHash(utils.Hex2Bytes(operator), utils.Hex2Bytes(sp.BLSPublicKeys[i]), sp.VotingPowers[i])
 	}
-	rootHash := merkle.GetRootHash(leaves)
+	rootHash := GetRootHash(leaves)
 	return bytes.Equal(rootHash, utils.Hex2Bytes(sp.CommitteeHeader.CurrentCommittee))
 }
 

@@ -1,4 +1,4 @@
-package merkle
+package stateproof
 
 import (
 	"math/big"

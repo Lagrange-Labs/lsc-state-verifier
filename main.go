@@ -10,9 +10,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/Lagrange-Labs/hash-demo/stateproof"
 	"github.com/Lagrange-Labs/lagrange-node/crypto"
 	"github.com/Lagrange-Labs/lagrange-node/logger"
+	"github.com/Lagrange-Labs/state-verifier/stateproof"
 )
 
 func main() {

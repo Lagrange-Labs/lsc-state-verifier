@@ -1,4 +1,4 @@
-module github.com/Lagrange-Labs/hash-demo
+module github.com/Lagrange-Labs/state-verifier
 
 go 1.21.0
 
