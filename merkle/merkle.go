@@ -1,7 +1,6 @@
 package merkle
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -20,8 +19,6 @@ func GetLeafHash(addr, pubKey []byte, votingPower uint64) []byte {
 	res = append(res, pubKey...)
 	res = append(res, addr...)
 	res = append(res, common.LeftPadBytes(big.NewInt(int64(votingPower)).Bytes(), 12)...)
-
-	fmt.Printf("Leaf pack: %x\n", res)
 
 	return crypto.Keccak256(res)
 }

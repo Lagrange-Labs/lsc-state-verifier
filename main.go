@@ -1,120 +1,71 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
-	"math/big"
 	"net/http"
 	"os"
+	"strconv"
 
-	"github.com/Lagrange-Labs/hash-demo/crypto"
-	"github.com/Lagrange-Labs/hash-demo/merkle"
 	"github.com/joho/godotenv"
+
+	"github.com/Lagrange-Labs/hash-demo/stateproof"
+	"github.com/Lagrange-Labs/lagrange-node/crypto"
+	"github.com/Lagrange-Labs/lagrange-node/logger"
 )
 
-type BlockData struct {
-	Addrs        []string `json:"address"`
-	BLSPubKeys   []string `json:"pubkeys"`
-	VotingPowers []uint64 `json:"votingPower"`
-	AggSignature string   `json:"agg_signature"`
-	ChainHeader  struct {
-		ChainID     uint32 `json:"chain_id"`
-		BlockNumber uint64 `json:"block_number"`
-		BlockHash   string `json:"block_hash"`
-	} `json:"chain_header"`
-	CurrentCommittee string  `json:"currentCommitteeeRoot"`
-	NextCommittee    string  `json:"nextCommitteeRoot"`
-	AggregationBits  []uint8 `json:"aggregationBits"`
-}
-
-func (b BlockData) Hash() []byte {
-	var blockNumberBuf [32]byte
-	blockHash := crypto.Hex2Bytes(b.ChainHeader.BlockHash)[:]
-	blockNumber := big.NewInt(int64(b.ChainHeader.BlockNumber)).FillBytes(blockNumberBuf[:])
-	chainID := make([]byte, 4)
-	binary.BigEndian.PutUint32(chainID, b.ChainHeader.ChainID)
-	chainHash := crypto.Hash(blockHash, blockNumber, chainID)
-
-	committeeRoot := crypto.Hex2Bytes(b.CurrentCommittee)
-	nextCommitteeRoot := crypto.Hex2Bytes(b.NextCommittee)
-	committeeHash := crypto.PoseidonHash(chainHash, committeeRoot, nextCommitteeRoot)
-
-	return committeeHash
-}
-
 func main() {
-
-	const (
-		OPTIMISM = "11155420"
-		ARBITRUM = "421614"
-		MANTLE   = "5003"
-	)
-	BLOCK_NUMBER := "17970459"
-
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		logger.Fatalf("Error loading .env file: %s", err)
 	}
 	apiKey := os.Getenv("API_KEY")
-
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://querylayer.lagrange.dev/blocks/block-data?chain_id=%s&block_number=%s", ARBITRUM, BLOCK_NUMBER), nil)
+	chainID, err := strconv.ParseUint(os.Getenv("CHAIN_ID"), 10, 32)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("Error parsing CHAIN_ID: %s", err)
+	}
+	batchNumber, err := strconv.ParseUint(os.Getenv("BATCH_NUMBER"), 10, 64)
+	if err != nil {
+		logger.Fatalf("Error parsing BATCH_NUMBER: %s", err)
+	}
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://querylayer.lagrange.dev/batches/state-proofs?chain_id=%d&batch_number=%d", chainID, batchNumber), nil)
+	if err != nil {
+		logger.Fatalf("Error creating request: %s", err)
 	}
 	req.Header.Set("x-api-key", apiKey)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("Error sending request: %s", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("Error reading response body: %s", err)
 	}
 
-	var blockData BlockData
-	if err = json.Unmarshal(body, &blockData); err != nil {
-		log.Fatal(err)
+	var proofData stateproof.StateProof
+	if err = json.Unmarshal(body, &proofData); err != nil {
+		logger.Fatalf("Error unmarshalling state proof data: %s", err)
+	}
+	if len(proofData.AggregatedSignature) == 0 {
+		logger.Fatalf("No state proof data found, please check the `API_KEY`, `CHAIN_ID`, and `BATCH_NUMBER`")
 	}
 
-	fmt.Printf("Block data: %+v\n", blockData)
-
-	blsScheme := crypto.NewBLSScheme(crypto.BN254)
-	leaves := make([][]byte, len(blockData.Addrs))
-	for i, addr := range blockData.Addrs {
-		rawPubKey, err := blsScheme.GetRawKey(crypto.Hex2Bytes(blockData.BLSPubKeys[i]))
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("\nRaw public key for %s: %x\n", addr, rawPubKey)
-		leaves[i] = merkle.GetLeafHash(crypto.Hex2Bytes(addr), rawPubKey, blockData.VotingPowers[i])
-		fmt.Printf("Leaf hash for %s: %x\n", addr, leaves[i])
+	// Verify the committee root
+	if !proofData.VerifyCommitteeRoot() {
+		logger.Fatalf("Committee root verification failed")
+	}
+	// Verify the voting power
+	if ok, err := proofData.VerifyVotingPower(); !ok {
+		logger.Fatalf("Voting power verification failed: %s", err)
+	}
+	// Verify the aggregated signature
+	if ok, err := proofData.VerifyAggregatedSignature(crypto.BN254); !ok {
+		logger.Fatalf("Aggregated signature verification failed: %s", err)
 	}
 
-	rootHash := merkle.GetRootHash(leaves)
-
-	if bytes.Equal(rootHash, crypto.Hex2Bytes(blockData.CurrentCommittee)) {
-		commitHash := blockData.Hash()
-		pubKeys := make([][]byte, 0)
-		for i, pubKey := range blockData.BLSPubKeys {
-			if blockData.AggregationBits[i] == 1 {
-				pubKeys = append(pubKeys, crypto.Hex2Bytes(pubKey))
-			}
-		}
-		fmt.Printf("\nCommittee hash: %x\n", commitHash)
-		fmt.Printf("Aggregated signature: %s\n", blockData.AggSignature)
-		fmt.Printf("Public keys: %x\n", pubKeys)
-		verified, err := blsScheme.VerifyAggregatedSignature(pubKeys, commitHash, crypto.Hex2Bytes(blockData.AggSignature))
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("Aggregated signature verified: %t\n", verified)
-	} else {
-		fmt.Printf("Root hash does not match: %x != %x\n", rootHash, crypto.Hex2Bytes(blockData.CurrentCommittee))
-	}
+	logger.Infof("State proof verification successful")
 }
