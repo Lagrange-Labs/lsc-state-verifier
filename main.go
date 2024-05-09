@@ -30,7 +30,7 @@ func main() {
 		logger.Fatalf("Error parsing BATCH_NUMBER: %s", err)
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://querylayer.lagrange.dev/batches/state-proofs?chain_id=%d&batch_number=%d", chainID, batchNumber), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.lagrange.dev/batches/state-proofs?chain_id=%d&batch_number=%d", chainID, batchNumber), nil)
 	if err != nil {
 		logger.Fatalf("Error creating request: %s", err)
 	}
