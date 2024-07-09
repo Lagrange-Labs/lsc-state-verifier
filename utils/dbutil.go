@@ -8,6 +8,7 @@ import (
 	"github.com/Lagrange-Labs/lagrange-node/logger"
 	"github.com/Lagrange-Labs/state-verifier/config"
 	"github.com/Lagrange-Labs/state-verifier/db"
+	"github.com/Lagrange-Labs/state-verifier/stateproof"
 )
 
 const (
@@ -25,45 +26,47 @@ func ProcessChainUsingDB(db db.Database, chain config.ChainConfig) error {
 		chain.FromBatchNumber = lastProcessedBatch + 1
 	}
 
+	var prevBatchStateProof *stateproof.StateProof
+	if chain.FromBatchNumber > 1 {
+		prevBatchStateProof, err = db.GetBatchStateProof(chain.ChainID, chain.FromBatchNumber-1)
+		if err != nil {
+			logger.Warnf("Could not fetch previous batch %d for chain %d: %s", chain.FromBatchNumber-1, chain.ChainID, err)
+			prevBatchStateProof = nil
+		}
+	}
+
 	for {
-		err := processBatchFromDB(db, chain.ChainID, chain.FromBatchNumber)
+		result, err := db.GetBatchStateProof(chain.ChainID, chain.FromBatchNumber)
+		if err != nil {
+			if strings.Contains(err.Error(), "no results found") {
+				logger.Infof("Batch %d for chain ID %d not found, waiting for the batch to be available", chain.FromBatchNumber, chain.ChainID)
+				time.Sleep(NewBatchSleep)
+				continue
+			}
+			logger.Errorf("Error fetching state proof for batch %d for chain ID %d: %s", chain.FromBatchNumber, chain.ChainID, err)
+			continue
+		}
+
+		err = verifyStateProof(result, prevBatchStateProof)
 		if err != nil {
 			if strings.Contains(err.Error(), "committee root verification failed") {
 				if err := db.AddFailedBatch(chain.ChainID, chain.FromBatchNumber); err != nil {
 					logger.Errorf("Error adding failed batch %d for chain ID %d: %s", chain.FromBatchNumber, chain.ChainID, err)
 				}
-				// Proceed to the next batch number
-				chain.FromBatchNumber++
-				time.Sleep(HistoricalBatchSleep)
-				continue
+			} else {
+				logger.Errorf("Error processing batch %d for chain ID %d: %s", chain.FromBatchNumber, chain.ChainID, err)
 			}
-			if strings.Contains(err.Error(), "error fetching state proof from DB: no results found") {
-				logger.Infof("Batch %d for chain ID %d not found, waiting for next batch", chain.FromBatchNumber, chain.ChainID)
-				time.Sleep(NewBatchSleep)
-				continue
-			}
-			// Log other errors and proceed to the next batch number
-			logger.Errorf("Error processing batch %d for chain ID %d: %s", chain.FromBatchNumber, chain.ChainID, err)
-		} else {
-			// Update the last processed batch number
-			if err := db.UpdateLastProcessedBatch(chain.ChainID, chain.FromBatchNumber); err != nil {
-				logger.Errorf("Error updating last processed batch number for chain ID %d: %s", chain.ChainID, err)
-			}
-			chain.FromBatchNumber++
-			time.Sleep(HistoricalBatchSleep)
 		}
-	}
-}
 
-// processBatchFromDB processes the batch from the DB.
-func processBatchFromDB(db db.Database, chainID, batchNumber int64) error {
-	logger.Infof("Processing batch %d for chain %d", batchNumber, chainID)
-	result, err := db.GetBatchStateProof(chainID, batchNumber)
-	if err != nil {
-		return fmt.Errorf("error fetching state proof from DB: %s", err)
+		// Update the last processed batch number after successful processing
+		if err := db.UpdateLastProcessedBatch(chain.ChainID, chain.FromBatchNumber); err != nil {
+			logger.Errorf("Error updating last processed batch number for chain ID %d: %s", chain.ChainID, err)
+		}
+
+		// Update prevBatchStateProof to the current result
+		prevBatchStateProof = result
+
+		chain.FromBatchNumber++
+		time.Sleep(HistoricalBatchSleep)
 	}
-	if err := verifyStateProof(result); err != nil {
-		return err
-	}
-	return nil
 }
