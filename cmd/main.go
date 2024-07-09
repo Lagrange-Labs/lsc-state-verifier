@@ -64,45 +64,45 @@ func main() {
 }
 
 func fetchStateProofFromAPI(c *cli.Context) error {
-    cfg, err := config.LoadCLIConfig(c)
-    if err != nil {
-        logger.Fatalf("Error loading config: %s", err)
-    }
+	cfg, err := config.LoadCLIConfig(c)
+	if err != nil {
+		logger.Fatalf("Error loading config: %s", err)
+	}
 
-    var wg sync.WaitGroup
-    for _, chain := range cfg.Chains {
-        wg.Add(1)
-        go func(chain config.ChainConfig) {
-            defer wg.Done()
-            err := utils.ProcessChainUsingAPI(cfg.ApiUrl, cfg.ApiKey, chain)
-            if err != nil {
-                logger.Errorf("Error processing chain ID %d: %s", chain.ChainID, err)
-            }
-        }(chain)
-    }
-    wg.Wait()
-    return nil
+	var wg sync.WaitGroup
+	for _, chain := range cfg.Chains {
+		wg.Add(1)
+		go func(chain config.ChainConfig) {
+			defer wg.Done()
+			err := utils.ProcessChainUsingAPI(cfg.ApiUrl, cfg.ApiKey, chain)
+			if err != nil {
+				logger.Errorf("Error processing chain ID %d: %s", chain.ChainID, err)
+			}
+		}(chain)
+	}
+	wg.Wait()
+	return nil
 }
 
 func fetchStateProofFromDB(c *cli.Context) error {
-    cfg, err := config.LoadCLIConfig(c)
-    if err != nil {
-        logger.Fatalf("Error loading config: %s", err)
-    }
+	cfg, err := config.LoadCLIConfig(c)
+	if err != nil {
+		logger.Fatalf("Error loading config: %s", err)
+	}
 
-	mongoDB, err := db.NewMongoDatabase(cfg.DatabaseURI, "state")
+	mongoDB, err := db.NewMongoDatabase(cfg.DatabaseURI)
 
-    var wg sync.WaitGroup
-    for _, chain := range cfg.Chains {
-        wg.Add(1)
-        go func(chain config.ChainConfig) {
-            defer wg.Done()
-            err := utils.ProcessChainUsingDB(mongoDB, chain)
-            if err != nil {
-                logger.Errorf("Error processing chain ID %d: %s", chain.ChainID, err)
-            }
-        }(chain)
-    }
-    wg.Wait()
-    return nil
+	var wg sync.WaitGroup
+	for _, chain := range cfg.Chains {
+		wg.Add(1)
+		go func(chain config.ChainConfig) {
+			defer wg.Done()
+			err := utils.ProcessChainUsingDB(mongoDB, chain)
+			if err != nil {
+				logger.Errorf("Error processing chain ID %d: %s", chain.ChainID, err)
+			}
+		}(chain)
+	}
+	wg.Wait()
+	return nil
 }

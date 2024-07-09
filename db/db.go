@@ -15,27 +15,26 @@ import (
 )
 
 type Database interface {
-    GetBatchStateProof(chainID, batchNumber int64) (*stateproof.StateProof, error)
-    // UpdateLastProcessedBatch(chainID, batchNumber int64) error
-    // AddFailedBatch(chainID, batchNumber int64) error
+	GetBatchStateProof(chainID, batchNumber int64) (*stateproof.StateProof, error)
+	UpdateLastProcessedBatch(chainID, batchNumber int64) error
+	AddFailedBatch(chainID, batchNumber int64) error
+	GetLastProcessedBatch(chainID int64) (int64, error)
 }
 
 type MongoDatabase struct {
-    client *mongo.Client
-    db     *mongo.Database
+	client *mongo.Client
 }
 
-func NewMongoDatabase(uri, dbName string) (*MongoDatabase, error) {
-    client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
-    if err != nil {
-        return nil, fmt.Errorf("error connecting to DB: %s", err)
-    }
-    db := client.Database(dbName)
-    return &MongoDatabase{client: client, db: db}, nil
+func NewMongoDatabase(uri string) (*MongoDatabase, error) {
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to DB: %s", err)
+	}
+	return &MongoDatabase{client: client}, nil
 }
 
 func (m *MongoDatabase) GetBatchStateProof(chainId, batchNumber int64) (*stateproof.StateProof, error) {
-    logger.Infof("Received GetBatchStateProofs request for chainId %d and batchNumber %d", chainId, batchNumber)
+	logger.Infof("Received GetBatchStateProofs request for chainId %d and batchNumber %d", chainId, batchNumber)
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
@@ -86,7 +85,7 @@ func (m *MongoDatabase) GetBatchStateProof(chainId, batchNumber int64) (*statepr
 		},
 	}
 
-	cursor, err := m.db.Collection("batches").Aggregate(ctx, pipeline)
+	cursor, err := m.client.Database("state").Collection("batches").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +99,6 @@ func (m *MongoDatabase) GetBatchStateProof(chainId, batchNumber int64) (*statepr
 
 		stateProof := &stateproof.StateProof{}
 
-		// Extract and assign values to StateProof fields
 		if aggSig, ok := result["agg_signature"].(string); ok {
 			stateProof.AggregatedSignature = aggSig
 		}
@@ -186,10 +184,34 @@ func (m *MongoDatabase) GetBatchStateProof(chainId, batchNumber int64) (*statepr
 
 }
 
-// func (m *MongoDatabase) UpdateLastProcessedBatch(chainID, batchNumber int64) error {
-//     // Implementation of updating last processed batch
-// }
+func (m *MongoDatabase) UpdateLastProcessedBatch(chainID, batchNumber int64) error {
+	logger.Infof("Updating last processed batch %d for chain %d in the database", batchNumber, chainID)
+	filter := bson.M{"chain_id": chainID}
+	update := bson.M{"$set": bson.M{"last_processed_batch": batchNumber}}
+	_, err := m.client.Database("verifier").Collection("processed_batches").UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true))
+	return err
+}
 
-// func (m *MongoDatabase) AddFailedBatch(chainID, batchNumber int64) error {
-//     // Implementation of adding failed batch
-// }
+func (m *MongoDatabase) AddFailedBatch(chainID, batchNumber int64) error {
+	logger.Infof("Adding failed batch %d for chain %d to the database", batchNumber, chainID)
+	doc := bson.M{"chain_id": chainID, "batch_number": batchNumber}
+	_, err := m.client.Database("verifier").Collection("batches").InsertOne(context.Background(), doc)
+	return err
+}
+
+func (m *MongoDatabase) GetLastProcessedBatch(chainID int64) (int64, error) {
+	logger.Infof("Fetching last processed batch for chain %d from the database", chainID)
+	var result struct {
+		LastProcessedBatch int64 `bson:"last_processed_batch"`
+	}
+	opts := options.FindOne().SetSort(bson.M{"last_processed_batch": -1})
+	filter := bson.M{"chain_id": chainID}
+	err := m.client.Database("verifier").Collection("processed_batches").FindOne(context.Background(), filter, opts).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return 0, nil // No records found, start from the beginning
+	} else if err != nil {
+		return 0, err
+	}
+	logger.Infof("Last processed batch for chain %d is %d", chainID, result.LastProcessedBatch)
+	return result.LastProcessedBatch, nil
+}

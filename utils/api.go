@@ -20,10 +20,8 @@ func ProcessChainUsingAPI(apiUrl, apiKey string, chain config.ChainConfig) error
 			logger.Errorf("Error processing batch %d for chain ID %d: %s", chain.FromBatchNumber, chain.ChainID, err)
 		}
 		chain.FromBatchNumber++
-		break
 		time.Sleep(1 * time.Second)
 	}
-	return nil
 }
 
 // processBatchFromAPI processes the batch from the API.
