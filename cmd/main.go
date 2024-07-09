@@ -91,6 +91,9 @@ func fetchStateProofFromDB(c *cli.Context) error {
 	}
 
 	mongoDB, err := db.NewMongoDatabase(cfg.DatabaseURI)
+	if err != nil {
+		logger.Fatalf("Error creating MongoDB client: %s", err)
+	}
 
 	var wg sync.WaitGroup
 	for _, chain := range cfg.Chains {
