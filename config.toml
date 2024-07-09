@@ -9,3 +9,7 @@ from_batch_number = 1
 [[chains]]
 chain_id = 8453
 from_batch_number = 1
+
+[[chains]]
+chain_id = 42161
+from_batch_number = 1
