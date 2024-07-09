@@ -15,6 +15,6 @@ COPY . .
 RUN make build
 
 FROM alpine:edge
-COPY config.toml /app/config.toml
+COPY ./config.toml /app/config.toml
 COPY --from=build /src/dist/lsc-state-verifier /app/lsc-state-verifier
-CMD ["/bin/sh", "-c", "/app/lsc-state-verifier db"]
+CMD ["/app/lsc-state-verifier", "db", "--config", "/app/config.toml"]
