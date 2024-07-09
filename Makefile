@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 VERSION := $(shell git describe --tags --always)
 GITREV := $(shell git rev-parse --short HEAD)
 GITBRANCH := $(shell git rev-parse --abbrev-ref HEAD)
@@ -28,7 +26,6 @@ docker-build: ## Builds a docker image with the binary
 	docker build -t lsc-state-verifier -f ./Dockerfile .
 .PHONY: docker-build
 
->>>>>>> 746cd58 (refactor: implement cli)
 # Linting, Teseting, Benchmarking
 golangci_lint_cmd=github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
 
@@ -41,11 +38,9 @@ lint:
 	@ $$(go env GOPATH)/bin/golangci-lint run --timeout=10m
 .PHONY:	lint install-linter
 
-<<<<<<< HEAD
 test: 
 	go test ./... --timeout=10m -v --race
 .PHONY: test
-=======
 run: build
 	./dist/$(GOBINARY) db
 
@@ -56,4 +51,3 @@ localnet-start: stop
 stop:
 	$(STOP)
 .PHONY: localnet-start stop
->>>>>>> 746cd58 (refactor: implement cli)
