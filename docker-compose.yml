@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  lsc-state-verifier:
+    image: lagrangelabs/lsc-state-verifier:develop
+    container_name: lsc-state-verifier
+    restart: always
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "/app/lsc-state-verifier db --config /app/config.toml"
+    volumes:
+      - ./config.toml:/app/config.toml
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "go", "service": "lsc-state-verifier}]'
