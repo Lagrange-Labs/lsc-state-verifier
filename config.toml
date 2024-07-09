@@ -1,0 +1,11 @@
+api_url = "https://api-statecommittee.lagrange.dev"
+api_key = "your_api_key"
+database_uri = "mongodb://localhost:27017"
+
+[[chains]]
+chain_id = 10
+from_batch_number = 4877
+
+[[chains]]
+chain_id = 8453
+from_batch_number = 1

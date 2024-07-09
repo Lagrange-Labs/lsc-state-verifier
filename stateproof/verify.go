@@ -11,13 +11,13 @@ import (
 
 // StateProof is the struct that represents the state proof.
 type StateProof struct {
-	OperatorAddresses   []string                   `json:"addresses"`
-	BLSPublicKeys       []string                   `json:"public_keys"`
-	VotingPowers        []uint64                   `json:"voting_powers"`
-	AggregatedSignature string                     `json:"agg_signature"`
-	CommitteeHeader     batchtypes.CommitteeHeader `json:"committee_header"`
-	BatchHeader         batchtypes.BatchHeader     `json:"batch_header"`
-	AggregationBits     []uint8                    `json:"aggregation_bits"`
+	OperatorAddresses   []string                    `json:"addresses"`
+	BLSPublicKeys       []string                    `json:"public_keys"`
+	VotingPowers        []uint64                    `json:"voting_powers"`
+	AggregatedSignature string                      `json:"agg_signature"`
+	CommitteeHeader     *batchtypes.CommitteeHeader `json:"committee_header"`
+	BatchHeader         *batchtypes.BatchHeader     `json:"batch_header"`
+	AggregationBits     []uint8                     `json:"aggregation_bits"`
 }
 
 // GetBatchHash returns the batch hash of the state proof.
