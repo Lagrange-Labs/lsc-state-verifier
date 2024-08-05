@@ -11,8 +11,7 @@ This repository contains a simple state verifier for the Lagrange State Committe
 ## Demo Usage
 
 1. `go mod download`
-2. Add your `API_KEY` in `.env` file.
-3. Choose `CHAIN_ID` and `BATCH_NUMBER` in `.env` file.
-   - `CHAIN_ID` is the chain id of the chain you want to verify the state of. `Optimism` is `10` and `Base` is `8453`.
-   - `BATCH_NUMBER` is the batch number of the chain you want to verify the state of. 1-indexed.
-4. Run `go run main.go` to verify the state of the chain.
+2. Choose `CHAIN_ID` and `BATCH_NUMBER` in `.env` file.
+   - `CHAIN_ID` is the chain id of the chain you want to verify the state of. Please refer to chain id in our [docs](https://docs.lagrange.dev/state-committees/operator-guide/supported-chains).
+   - `BATCH_NUMBER` is the batch number of the chain you want to verify the state proof.
+3. Run `go run main.go` to verify the state of the chain.
