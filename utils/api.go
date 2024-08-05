@@ -45,7 +45,6 @@ func getBatchStateProofFromAPI(apiUrl, apiKey string, chainID, batchNumber int64
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %s", err)
 	}
-	req.Header.Set("x-api-key", apiKey)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %s", err)

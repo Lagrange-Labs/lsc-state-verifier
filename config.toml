@@ -1,5 +1,4 @@
 api_url = "https://api-statecommittee.lagrange.dev"
-api_key = "your_api_key"
 database_uri = "mongodb://localhost:27017"
 
 [[chains]]
