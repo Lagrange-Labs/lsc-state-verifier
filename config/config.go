@@ -20,7 +20,6 @@ type ChainConfig struct {
 
 type CLIConfig struct {
 	ApiUrl      string        `mapstructure:"api_url"`
-	ApiKey      string        `mapstructure:"api_key"`
 	Chains      []ChainConfig `mapstructure:"chains"`
 	DatabaseURI string        `mapstructure:"database_uri"`
 }
