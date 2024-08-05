@@ -74,7 +74,7 @@ func fetchStateProofFromAPI(c *cli.Context) error {
 		wg.Add(1)
 		go func(chain config.ChainConfig) {
 			defer wg.Done()
-			err := utils.ProcessChainUsingAPI(cfg.ApiUrl, cfg.ApiKey, chain)
+			err := utils.ProcessChainUsingAPI(cfg.ApiUrl, chain)
 			if err != nil {
 				logger.Errorf("Error processing chain ID %d: %s", chain.ChainID, err)
 			}

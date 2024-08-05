@@ -14,11 +14,11 @@ import (
 )
 
 // ProcessChainUsingAPI processes the chain using the API.
-func ProcessChainUsingAPI(apiUrl, apiKey string, chain config.ChainConfig) error {
+func ProcessChainUsingAPI(apiUrl string, chain config.ChainConfig) error {
 	var prevBatchStateProof *stateproof.StateProof
 
 	for {
-		proofData, err := getBatchStateProofFromAPI(apiUrl, apiKey, chain.ChainID, chain.FromBatchNumber)
+		proofData, err := getBatchStateProofFromAPI(apiUrl, chain.ChainID, chain.FromBatchNumber)
 		if err != nil {
 			if strings.Contains(err.Error(), "no results found") {
 				logger.Infof("Batch %d for chain ID %d not found, waiting for the batch to be available", chain.FromBatchNumber, chain.ChainID)
@@ -39,7 +39,7 @@ func ProcessChainUsingAPI(apiUrl, apiKey string, chain config.ChainConfig) error
 }
 
 // getBatchStateProofFromAPI fetches the batch state proof from the API.
-func getBatchStateProofFromAPI(apiUrl, apiKey string, chainID, batchNumber int64) (*stateproof.StateProof, error) {
+func getBatchStateProofFromAPI(apiUrl string, chainID, batchNumber int64) (*stateproof.StateProof, error) {
 	logger.Infof("Processing batch %d for chain %d", batchNumber, chainID)
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/batches/state-proofs?chain_id=%d&batch_number=%d", apiUrl, chainID, batchNumber), nil)
 	if err != nil {
