@@ -20,7 +20,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Error loading .env file: %s", err)
 	}
-	apiKey := os.Getenv("API_KEY")
 	chainID, err := strconv.ParseUint(os.Getenv("CHAIN_ID"), 10, 32)
 	if err != nil {
 		logger.Fatalf("Error parsing CHAIN_ID: %s", err)
@@ -30,11 +29,10 @@ func main() {
 		logger.Fatalf("Error parsing BATCH_NUMBER: %s", err)
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.lagrange.dev/batches/state-proofs?chain_id=%d&batch_number=%d", chainID, batchNumber), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api-statecommittee.lagrange.dev/batches/state-proofs?chain_id=%d&batch_number=%d", chainID, batchNumber), nil)
 	if err != nil {
 		logger.Fatalf("Error creating request: %s", err)
 	}
-	req.Header.Set("x-api-key", apiKey)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logger.Fatalf("Error sending request: %s", err)
