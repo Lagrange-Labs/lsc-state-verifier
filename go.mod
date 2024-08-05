@@ -3,7 +3,7 @@ module github.com/Lagrange-Labs/state-verifier
 go 1.21.0
 
 require (
-	github.com/Lagrange-Labs/lagrange-node v0.0.0-20240805123106-6b97a0164d42
+	github.com/Lagrange-Labs/lagrange-node v1.0.0
 	github.com/ethereum/go-ethereum v1.13.15
 	github.com/joho/godotenv v1.5.1
 )
