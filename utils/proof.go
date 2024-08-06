@@ -5,7 +5,7 @@ import (
 
 	"github.com/Lagrange-Labs/lagrange-node/crypto"
 	"github.com/Lagrange-Labs/lagrange-node/logger"
-	"github.com/Lagrange-Labs/state-verifier/stateproof"
+	"github.com/Lagrange-Labs/lsc-state-verifier/stateproof"
 )
 
 // verifyStateProof verifies the state proof.

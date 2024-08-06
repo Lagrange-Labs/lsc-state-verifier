@@ -7,9 +7,9 @@ import (
 	"sync"
 
 	"github.com/Lagrange-Labs/lagrange-node/logger"
-	"github.com/Lagrange-Labs/state-verifier/config"
-	"github.com/Lagrange-Labs/state-verifier/db"
-	"github.com/Lagrange-Labs/state-verifier/utils"
+	"github.com/Lagrange-Labs/lsc-state-verifier/config"
+	"github.com/Lagrange-Labs/lsc-state-verifier/db"
+	"github.com/Lagrange-Labs/lsc-state-verifier/utils"
 	"github.com/urfave/cli/v2"
 )
 

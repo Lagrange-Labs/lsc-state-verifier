@@ -7,7 +7,7 @@ import (
 
 	"github.com/Lagrange-Labs/lagrange-node/logger"
 	sequencertypes "github.com/Lagrange-Labs/lagrange-node/sequencer/types/v2"
-	"github.com/Lagrange-Labs/state-verifier/stateproof"
+	"github.com/Lagrange-Labs/lsc-state-verifier/stateproof"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
