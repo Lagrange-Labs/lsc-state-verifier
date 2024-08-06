@@ -1,4 +1,4 @@
-module github.com/Lagrange-Labs/state-verifier
+module github.com/Lagrange-Labs/lsc-state-verifier
 
 go 1.21.0
 
