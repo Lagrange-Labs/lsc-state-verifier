@@ -22,7 +22,7 @@ type StateProof struct {
 
 // GetBatchHash returns the batch hash of the state proof.
 func (sp *StateProof) GetBatchHash() []byte {
-	h := append([]byte{}, sp.BatchHeader.Hash()...)
+	h := append([]byte{}, sp.BatchHeader.MerkleHash()...)
 	h = append(h, utils.Hex2Bytes(sp.CommitteeHeader.CurrentCommittee)...)
 	h = append(h, utils.Hex2Bytes(sp.CommitteeHeader.NextCommittee)...)
 	h = append(h, utils.Uint64ToBytes(sp.CommitteeHeader.TotalVotingPower)...)
